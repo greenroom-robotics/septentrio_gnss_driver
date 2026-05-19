@@ -24,11 +24,12 @@ version = "*"
 
 [package.build.config]
 mode = "pixi-native"
-build-type = "ament_cmake"
+build-type = "ament_idl"
 distro = "kilted"
 
 [package.host-dependencies]
 ros-kilted-ament-cmake               = "*"
+ros-kilted-ament-cmake-gtest         = "*"
 ros-kilted-rclcpp                    = "*"
 ros-kilted-rclcpp-components         = "*"
 ros-kilted-rosidl-default-generators = "*"
@@ -46,7 +47,7 @@ ros-kilted-tf2-geometry-msgs         = "*"
 ros-kilted-tf2-ros                   = "*"
 libboost-devel                       = "*"
 libpcap                              = "*"
-geographiclib                        = "*"
+geographiclib-cpp                    = "*"
 
 [package.run-dependencies]
 ros-kilted-rclcpp                    = "*"
@@ -66,4 +67,4 @@ ros-kilted-tf2-geometry-msgs         = "*"
 ros-kilted-tf2-ros                   = "*"
 libboost-devel                       = "*"
 libpcap                              = "*"
-geographiclib                        = "*"
+geographiclib-cpp                    = "*"
