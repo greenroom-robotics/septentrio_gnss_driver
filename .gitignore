@@ -5,3 +5,5 @@ install
 log
 msg/BlockHeader.msg
 __pycache__
+.pixi/
+pixi.lock
