@@ -10,6 +10,7 @@ preview = ["pixi-build"]
 
 [dependencies]
 septentrio_gnss_driver = { path = "." }
+mise = "*"
 
 [package]
 name = "septentrio_gnss_driver"
