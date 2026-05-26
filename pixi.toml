@@ -28,6 +28,7 @@ mode = "pixi-native"
 build-type = "ament_idl"
 distro = "kilted"
 
+build-number = 1
 [package.host-dependencies]
 ros-kilted-ament-cmake               = "*"
 ros-kilted-ament-cmake-gtest         = "*"
