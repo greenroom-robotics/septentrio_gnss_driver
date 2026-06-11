@@ -1,7 +1,7 @@
 [workspace]
 name = "septentrio_gnss_driver"
 channels = [
-  "http://localhost:8000/general",
+  "http://localhost:12222/general",
   "https://prefix.dev/robostack-kilted",
   "https://prefix.dev/conda-forge",
 ]
@@ -10,25 +10,30 @@ preview = ["pixi-build"]
 
 [dependencies]
 septentrio_gnss_driver = { path = "." }
-mise = "*"
+mise                   = "*"
 
 [package]
-name = "septentrio_gnss_driver"
-version = "1.5.4"
+name        = "septentrio_gnss_driver"
+version     = "1.5.4"
 description = "ROSaic: C++ driver for Septentrio's GNSS and INS receivers"
-license = "BSD-3-Clause"
-authors = ["Greenroom Robotics <software-team@greenroomrobotics.com>"]
+license     = "BSD-3-Clause"
+authors     = ["Greenroom Robotics <software-team@greenroomrobotics.com>"]
 
 [package.build.backend]
-name = "pixi-build-ros-gr"
-version = "*"
+name    = "pixi-build-ros-gr"
+version = ">=0.4,<0.5"
 
+# build-type = ament_idl: this package both generates interfaces AND builds a
+# node/library. ament_idl uses the same build flow as ament_cmake (full cmake
+# configure/build) but the synthesized package.xml carries the
+# <member_of_group>rosidl_interface_packages</member_of_group> that
+# rosidl_generate_interfaces() hard-requires.
 [package.build.config]
-mode = "pixi-native"
-build-type = "ament_idl"
-distro = "kilted"
-
+mode         = "pixi-native"
+build-type   = "ament_idl"
+distro       = "kilted"
 build-number = 1
+
 [package.host-dependencies]
 ros-kilted-ament-cmake               = "*"
 ros-kilted-ament-cmake-gtest         = "*"
@@ -47,26 +52,67 @@ ros-kilted-tf2                       = "*"
 ros-kilted-tf2-eigen                 = "*"
 ros-kilted-tf2-geometry-msgs         = "*"
 ros-kilted-tf2-ros                   = "*"
+ros-kilted-std-msgs                  = "*"
 libboost-devel                       = "*"
 libpcap                              = "*"
 geographiclib-cpp                    = "*"
 
 [package.run-dependencies]
-ros-kilted-rclcpp                    = "*"
-ros-kilted-rclcpp-components         = "*"
+ros-kilted-rclcpp                 = "*"
+ros-kilted-rclcpp-components      = "*"
+ros-kilted-rosidl-default-runtime = "*"
+ros-kilted-diagnostic-msgs        = "*"
+ros-kilted-diagnostic-updater     = "*"
+ros-kilted-nmea-msgs              = "*"
+ros-kilted-sensor-msgs            = "*"
+ros-kilted-geometry-msgs          = "*"
+ros-kilted-geographic-msgs        = "*"
+ros-kilted-gps-msgs               = "*"
+ros-kilted-nav-msgs               = "*"
+ros-kilted-tf2                    = "*"
+ros-kilted-tf2-eigen              = "*"
+ros-kilted-tf2-geometry-msgs      = "*"
+ros-kilted-tf2-ros                = "*"
+libboost                          = "*"
+libpcap                           = "*"
+geographiclib-cpp                 = "*"
+
+# Test env builds the package from source with colcon (deb parity),
+# so it needs the build (host) deps as well as the test deps.
+[feature.tests.dependencies]
+# conda toolchain: keeps colcon include/link paths inside the env
+cxx-compiler                  = "*"
+cmake                         = "*"
+make                          = "*"
+pkg-config                    = "*"
+ros-kilted-ament-cmake        = "*"
+ros-kilted-ament-cmake-gtest  = "*"
+ros-kilted-rclcpp             = "*"
+ros-kilted-rclcpp-components  = "*"
+ros-kilted-diagnostic-msgs    = "*"
+ros-kilted-diagnostic-updater = "*"
+ros-kilted-nmea-msgs          = "*"
+ros-kilted-sensor-msgs        = "*"
+ros-kilted-geometry-msgs      = "*"
+ros-kilted-geographic-msgs    = "*"
+ros-kilted-gps-msgs           = "*"
+ros-kilted-nav-msgs           = "*"
+ros-kilted-tf2                = "*"
+ros-kilted-tf2-eigen          = "*"
+ros-kilted-tf2-geometry-msgs  = "*"
+ros-kilted-tf2-ros            = "*"
+ros-kilted-std-msgs           = "*"
+libboost-devel                = "*"
+libboost                      = "*"
+libpcap                       = "*"
+geographiclib-cpp             = "*"
+# the interface build backend injects rosidl itself; a colcon source build needs it explicitly
+ros-kilted-rosidl-default-generators = "*"
 ros-kilted-rosidl-default-runtime    = "*"
-ros-kilted-diagnostic-msgs           = "*"
-ros-kilted-diagnostic-updater        = "*"
-ros-kilted-nmea-msgs                 = "*"
-ros-kilted-sensor-msgs               = "*"
-ros-kilted-geometry-msgs             = "*"
-ros-kilted-geographic-msgs           = "*"
-ros-kilted-gps-msgs                  = "*"
-ros-kilted-nav-msgs                  = "*"
-ros-kilted-tf2                       = "*"
-ros-kilted-tf2-eigen                 = "*"
-ros-kilted-tf2-geometry-msgs         = "*"
-ros-kilted-tf2-ros                   = "*"
-libboost-devel                       = "*"
-libpcap                              = "*"
-geographiclib-cpp                    = "*"
+colcon-common-extensions             = "*"
+
+[feature.tests.tasks]
+test = "colcon build && (LD_PRELOAD=$CONDA_PREFIX/lib/libpython3.so colcon test --event-handlers console_direct+ || true) && colcon test-result --all --verbose"
+
+[environments]
+tests = { features = ["tests"], no-default-feature = true }
