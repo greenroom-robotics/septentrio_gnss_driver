@@ -9,6 +9,7 @@ platforms = ["linux-64", "linux-aarch64"]
 preview = ["pixi-build"]
 
 [dependencies]
+ros-kilted-desktop = "*"
 septentrio_gnss_driver = { path = "." }
 mise                   = "*"
 
@@ -77,42 +78,34 @@ libboost                          = "*"
 libpcap                           = "*"
 geographiclib-cpp                 = "*"
 
-# Test env builds the package from source with colcon (deb parity),
-# so it needs the build (host) deps as well as the test deps.
-[feature.tests.dependencies]
-# conda toolchain: keeps colcon include/link paths inside the env
-cxx-compiler                  = "*"
-cmake                         = "*"
-make                          = "*"
-pkg-config                    = "*"
-ros-kilted-ament-cmake        = "*"
-ros-kilted-ament-cmake-gtest  = "*"
-ros-kilted-rclcpp             = "*"
-ros-kilted-rclcpp-components  = "*"
-ros-kilted-diagnostic-msgs    = "*"
-ros-kilted-diagnostic-updater = "*"
-ros-kilted-nmea-msgs          = "*"
-ros-kilted-sensor-msgs        = "*"
-ros-kilted-geometry-msgs      = "*"
-ros-kilted-geographic-msgs    = "*"
-ros-kilted-gps-msgs           = "*"
-ros-kilted-nav-msgs           = "*"
-ros-kilted-tf2                = "*"
-ros-kilted-tf2-eigen          = "*"
-ros-kilted-tf2-geometry-msgs  = "*"
-ros-kilted-tf2-ros            = "*"
-ros-kilted-std-msgs           = "*"
-libboost-devel                = "*"
-libboost                      = "*"
-libpcap                       = "*"
-geographiclib-cpp             = "*"
-# the interface build backend injects rosidl itself; a colcon source build needs it explicitly
-ros-kilted-rosidl-default-generators = "*"
-ros-kilted-rosidl-default-runtime    = "*"
-colcon-common-extensions             = "*"
+# Build-only tools the run-closure (pulled in via the default feature's path
+# dependency) doesn't provide. Everything else — ament-cmake, the rosidl stack,
+# the message packages — comes transitively, so it isn't re-listed here.
+[feature.dev.dependencies]
+colcon-common-extensions              = "*"
+cxx-compiler                          = "*"
+make                                  = "*"
+pkg-config                            = "*"
+ros-kilted-rosidl-default-generators  = "*"
 
-[feature.tests.tasks]
-test = "colcon build && (LD_PRELOAD=$CONDA_PREFIX/lib/libpython3.so colcon test --event-handlers console_direct+ || true) && colcon test-result --all --verbose"
+[feature.dev.tasks]
+build = "colcon build"
+
+# Tests extend dev: same build env, plus lint tooling and the test task.
+[feature.tests.dependencies]
+ros-kilted-ament-lint-auto = "*"
+
+# `test` runs build -> colcon-test -> test-result as a dependency chain. A
+# failing step stops the chain and fails the task, so a build break or a test
+# failure both surface — no exit codes to juggle.
+[feature.tests.tasks.colcon-test]
+cmd        = "LD_PRELOAD=$CONDA_PREFIX/lib/libpython3.so colcon test --event-handlers console_direct+"
+depends-on = ["build"]
+
+[feature.tests.tasks.test]
+cmd        = "colcon test-result --all --verbose"
+depends-on = ["colcon-test"]
 
 [environments]
-tests = { features = ["tests"], no-default-feature = true }
+dev   = { features = ["dev"] }
+tests = { features = ["dev", "tests"] }
