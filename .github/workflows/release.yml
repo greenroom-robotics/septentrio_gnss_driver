@@ -67,6 +67,7 @@ jobs:
           package: ${{ github.event.inputs.package }}
           arch: ${{ matrix.job.arch }}
           ros_distro: ${{ matrix.ros_distro }}
-          github_release: ${{ matrix.job.github_release }}
+          github_release: false
+          skip_tag: true
           public: true
           changelog: false

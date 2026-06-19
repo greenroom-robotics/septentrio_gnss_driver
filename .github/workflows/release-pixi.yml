@@ -7,6 +7,7 @@ on:
         description: 'If not specified, all packages will be released.'
         options:
           - ""
+          - septentrio_gnss_driver
       changelog:
         type: boolean
         default: true
