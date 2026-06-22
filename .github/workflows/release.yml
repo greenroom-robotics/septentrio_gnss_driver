@@ -1,5 +1,4 @@
 name: Tag & Release
-
 on:
   workflow_dispatch:
     inputs:
@@ -9,65 +8,51 @@ on:
         options:
           - ""
           - septentrio_gnss_driver
-
       build_kilted:
         type: boolean
         default: true
         description: "Release for Kilted"
-
       build_jazzy:
         type: boolean
         default: true
         description: "Release for Jazzy"
 
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    outputs:
-      distros: ${{ steps.set-distros.outputs.distros }}
+  deb:
+    uses: Greenroom-Robotics/ros_semantic_release_action/.github/workflows/release.yml@main
+    with:
+      package: ${{ inputs.package }}
+      package_dir: .
+      build_kilted: ${{ inputs.build_kilted }}
+      build_jazzy: ${{ inputs.build_jazzy }}
+      changelog: false
+      skip_tag: false
+    secrets:
+      token: ${{ secrets.API_TOKEN_GITHUB }}
+
+  pixi:
+    needs: deb
+    runs-on: 2vcpu-ubuntu-2404
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - id: set-distros
-        run: |
-          distros=()
-          [ "${{ github.event.inputs.build_jazzy }}" == "true" ] && distros+=("jazzy")
-          [ "${{ github.event.inputs.build_kilted }}" == "true" ] && distros+=("kilted")
-
-          if [ ${#distros[@]} -eq 0 ]; then
-            echo "::error::No distros selected. Please enable release for at least one of the available distros."
-            exit 1
-          fi
-
-          echo "distros=$(jq -cn '$ARGS.positional' --args "${distros[@]}")" >> $GITHUB_OUTPUT
-
-  release:
-    needs: setup
-    strategy:
-      fail-fast: true
-      matrix:
-        ros_distro: ${{ fromJson(needs.setup.outputs.distros) }}
-        job:
-          - runner: 8vcpu-ubuntu-2404
-            arch: amd64
-            github_release: true
-          - runner: 16vcpu-ubuntu-2404-arm
-            arch: arm64
-            github_release: false
-
-    name: Release - ${{ matrix.job.arch }} - ${{ matrix.ros_distro }}
-    runs-on: ${{ matrix.job.runner }}
-
-    steps:
-      - name: Checkout this repository
-        uses: actions/checkout@v3
-
-      - name: Semantic release
-        uses: Greenroom-Robotics/ros_semantic_release_action@main
+      - uses: actions/checkout@v6
         with:
-          token: ${{ secrets.API_TOKEN_GITHUB }}
-          package: ${{ github.event.inputs.package }}
-          arch: ${{ matrix.job.arch }}
-          ros_distro: ${{ matrix.ros_distro }}
-          github_release: false
-          skip_tag: true
-          public: true
-          changelog: false
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: greenroom-robotics/mise/.github/actions/recipes-pr@v4
+        with:
+          dispatch-sha: ${{ github.sha }}
+          package: ${{ inputs.package }}
+          ros-distro: kilted
+          gh-app-client-id: ${{ secrets.GH_APP_CLIENT_ID }}
+          gh-app-private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
