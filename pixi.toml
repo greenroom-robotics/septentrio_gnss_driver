@@ -11,18 +11,18 @@ preview = ["pixi-build"]
 [dependencies]
 ros-kilted-desktop = "*"
 septentrio_gnss_driver = { path = "." }
-mise                   = "*"
+mise = "*"
 
 [package]
-name        = "septentrio_gnss_driver"
-version     = "1.5.4"
+name = "septentrio_gnss_driver"
+version = "1.5.4"
 description = "ROSaic: C++ driver for Septentrio's GNSS and INS receivers"
-license     = "BSD-3-Clause"
-authors     = ["Greenroom Robotics <software-team@greenroomrobotics.com>"]
+license = "BSD-3-Clause"
+authors = ["Greenroom Robotics <software-team@greenroomrobotics.com>"]
 
 [package.build.backend]
-name    = "pixi-build-ros-gr"
-version = ">=0.4,<0.5"
+name = "pixi-build-ros-gr"
+version = "*"
 
 # build-type = ament_idl: this package both generates interfaces AND builds a
 # node/library. ament_idl uses the same build flow as ament_cmake (full cmake
@@ -30,60 +30,60 @@ version = ">=0.4,<0.5"
 # <member_of_group>rosidl_interface_packages</member_of_group> that
 # rosidl_generate_interfaces() hard-requires.
 [package.build.config]
-mode         = "pixi-native"
-build-type   = "ament_idl"
-distro       = "kilted"
+mode = "pixi-native"
+build-type = "ament_idl"
+distro = "kilted"
 build-number = 1
 
 [package.host-dependencies]
-ros-kilted-ament-cmake               = "*"
-ros-kilted-ament-cmake-gtest         = "*"
-ros-kilted-rclcpp                    = "*"
-ros-kilted-rclcpp-components         = "*"
+ros-kilted-ament-cmake = "*"
+ros-kilted-ament-cmake-gtest = "*"
+ros-kilted-rclcpp = "*"
+ros-kilted-rclcpp-components = "*"
 ros-kilted-rosidl-default-generators = "*"
-ros-kilted-diagnostic-msgs           = "*"
-ros-kilted-diagnostic-updater        = "*"
-ros-kilted-nmea-msgs                 = "*"
-ros-kilted-sensor-msgs               = "*"
-ros-kilted-geometry-msgs             = "*"
-ros-kilted-geographic-msgs           = "*"
-ros-kilted-gps-msgs                  = "*"
-ros-kilted-nav-msgs                  = "*"
-ros-kilted-tf2                       = "*"
-ros-kilted-tf2-eigen                 = "*"
-ros-kilted-tf2-geometry-msgs         = "*"
-ros-kilted-tf2-ros                   = "*"
-ros-kilted-std-msgs                  = "*"
-libboost-devel                       = "*"
-libpcap                              = "*"
-geographiclib-cpp                    = "*"
+ros-kilted-diagnostic-msgs = "*"
+ros-kilted-diagnostic-updater = "*"
+ros-kilted-nmea-msgs = "*"
+ros-kilted-sensor-msgs = "*"
+ros-kilted-geometry-msgs = "*"
+ros-kilted-geographic-msgs = "*"
+ros-kilted-gps-msgs = "*"
+ros-kilted-nav-msgs = "*"
+ros-kilted-tf2 = "*"
+ros-kilted-tf2-eigen = "*"
+ros-kilted-tf2-geometry-msgs = "*"
+ros-kilted-tf2-ros = "*"
+ros-kilted-std-msgs = "*"
+libboost-devel = "*"
+libpcap = "*"
+geographiclib-cpp = "*"
 
 [package.run-dependencies]
-ros-kilted-rclcpp                 = "*"
-ros-kilted-rclcpp-components      = "*"
+ros-kilted-rclcpp = "*"
+ros-kilted-rclcpp-components = "*"
 ros-kilted-rosidl-default-runtime = "*"
-ros-kilted-diagnostic-msgs        = "*"
-ros-kilted-diagnostic-updater     = "*"
-ros-kilted-nmea-msgs              = "*"
-ros-kilted-sensor-msgs            = "*"
-ros-kilted-geometry-msgs          = "*"
-ros-kilted-geographic-msgs        = "*"
-ros-kilted-gps-msgs               = "*"
-ros-kilted-nav-msgs               = "*"
-ros-kilted-tf2                    = "*"
-ros-kilted-tf2-eigen              = "*"
-ros-kilted-tf2-geometry-msgs      = "*"
-ros-kilted-tf2-ros                = "*"
-libboost                          = "*"
-libpcap                           = "*"
-geographiclib-cpp                 = "*"
+ros-kilted-diagnostic-msgs = "*"
+ros-kilted-diagnostic-updater = "*"
+ros-kilted-nmea-msgs = "*"
+ros-kilted-sensor-msgs = "*"
+ros-kilted-geometry-msgs = "*"
+ros-kilted-geographic-msgs = "*"
+ros-kilted-gps-msgs = "*"
+ros-kilted-nav-msgs = "*"
+ros-kilted-tf2 = "*"
+ros-kilted-tf2-eigen = "*"
+ros-kilted-tf2-geometry-msgs = "*"
+ros-kilted-tf2-ros = "*"
+libboost = "*"
+libpcap = "*"
+geographiclib-cpp = "*"
 
 # Tests: ros-dev-tools-meta brings the full build toolchain; surviving dev deps
 # and lint tooling are listed explicitly below.
 [feature.tests.dependencies]
-ros-dev-tools-meta                    = "*"
-ros-kilted-rosidl-default-generators  = "*"
-ros-kilted-ament-lint-auto            = "*"
+ros-dev-tools-meta = "*"
+ros-kilted-rosidl-default-generators = "*"
+ros-kilted-ament-lint-auto = "*"
 
 [feature.tests.tasks]
 build = "colcon build"
@@ -92,11 +92,11 @@ build = "colcon build"
 # failing step stops the chain and fails the task, so a build break or a test
 # failure both surface — no exit codes to juggle.
 [feature.tests.tasks.colcon-test]
-cmd        = "bash -c 'colcon test --event-handlers console_direct+ || [ $? -eq 5 ]'"
+cmd = "bash -c 'colcon test --event-handlers console_direct+ || [ $? -eq 5 ]'"
 depends-on = ["build"]
 
 [feature.tests.tasks.test]
-cmd        = "colcon test-result --all --verbose"
+cmd = "colcon test-result --all --verbose"
 depends-on = ["colcon-test"]
 
 [environments]
