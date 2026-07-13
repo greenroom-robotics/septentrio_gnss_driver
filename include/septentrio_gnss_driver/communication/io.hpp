@@ -267,14 +267,13 @@ namespace io {
 
         [[nodiscard]] bool connect()
         {
-            boost::asio::ip::tcp::resolver::iterator endpointIterator;
+            boost::asio::ip::tcp::resolver::results_type endpoints;
 
             try
             {
                 boost::asio::ip::tcp::resolver resolver(*ioService_);
-                boost::asio::ip::tcp::resolver::query query(
-                    node_->settings()->device_tcp_ip, port_);
-                endpointIterator = resolver.resolve(query);
+                endpoints =
+                    resolver.resolve(node_->settings()->device_tcp_ip, port_);
             } catch (const std::runtime_error& e)
             {
                 node_->log(log_level::ERROR,
@@ -291,20 +290,20 @@ namespace io {
 
             try
             {
-                boost::system::error_code ec = connectInternal(endpointIterator);
+                boost::system::error_code ec = connectInternal(endpoints);
                 while (node_->ok() && ec)
                 {
                     node_->log(
                         log_level::ERROR_THROTTLE,
                         "TCP connection to " +
-                            endpointIterator->endpoint().address().to_string() +
+                            endpoints.begin()->endpoint().address().to_string() +
                             " on port " +
-                            std::to_string(endpointIterator->endpoint().port()) +
+                            std::to_string(endpoints.begin()->endpoint().port()) +
                             " failed: " + ec.message() + ". Retrying ...",
                         std::chrono::milliseconds(5000));
                     using namespace std::chrono_literals;
                     std::this_thread::sleep_for(1s);
-                    ec = connectInternal(endpointIterator);
+                    ec = connectInternal(endpoints);
                 }
                 if (ec)
                     return false;
@@ -312,28 +311,28 @@ namespace io {
             } catch (const std::runtime_error& e)
             {
                 node_->log(log_level::ERROR,
-                           "Could not connect to " + endpointIterator->host_name() +
-                               ": " + endpointIterator->service_name() + ": " +
-                               e.what());
+                           "Could not connect to " +
+                               endpoints.begin()->host_name() + ": " +
+                               endpoints.begin()->service_name() + ": " + e.what());
                 return false;
             }
 
             deadline_.expires_at(boost::posix_time::pos_infin);
             stream_->set_option(boost::asio::ip::tcp::no_delay(true));
             node_->log(log_level::INFO, "Connected to " +
-                                            endpointIterator->host_name() + ":" +
-                                            endpointIterator->service_name() + ".");
+                                            endpoints.begin()->host_name() + ":" +
+                                            endpoints.begin()->service_name() + ".");
             return true;
         }
 
     private:
         boost::system::error_code connectInternal(
-            const boost::asio::ip::tcp::resolver::iterator& endpointIterator)
+            const boost::asio::ip::tcp::resolver::results_type& endpoints)
         {
             boost::system::error_code ec;
             deadline_.expires_from_now(boost::posix_time::seconds(10));
             ec = boost::asio::error::would_block;
-            boost::asio::async_connect(*stream_, endpointIterator,
+            boost::asio::async_connect(*stream_, endpoints,
                                        boost::lambda::var(ec) = boost::lambda::_1);
             do
                 ioService_->run_one();
