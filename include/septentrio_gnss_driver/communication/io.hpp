@@ -208,7 +208,7 @@ namespace io {
                 {
                     node_->log(log_level::ERROR,
                                "UDP client connection lost. Trying to reconnect.");
-                    ioService_.reset();
+                    ioService_.restart();
                     ioThread_.join();
                     connect();
                 }
@@ -233,7 +233,7 @@ namespace io {
         ROSaicNodeBase* node_;
         std::atomic<bool> running_;
         int16_t port_;
-        boost::asio::io_service ioService_;
+        boost::asio::io_context ioService_;
         std::thread ioThread_;
         std::thread watchdogThread_;
         boost::asio::ip::udp::endpoint eP_;
@@ -246,7 +246,7 @@ namespace io {
     {
     public:
         TcpIo(ROSaicNodeBase* node,
-              std::shared_ptr<boost::asio::io_service> ioService) :
+              std::shared_ptr<boost::asio::io_context> ioService) :
             node_(node), ioService_(ioService), deadline_(*ioService_)
         {
             port_ = node_->settings()->device_tcp_port;
@@ -355,7 +355,7 @@ namespace io {
         }
 
         ROSaicNodeBase* node_;
-        std::shared_ptr<boost::asio::io_service> ioService_;
+        std::shared_ptr<boost::asio::io_context> ioService_;
         boost::asio::deadline_timer deadline_;
 
         std::string port_;
@@ -368,7 +368,7 @@ namespace io {
     {
     public:
         SerialIo(ROSaicNodeBase* node,
-                 std::shared_ptr<boost::asio::io_service> ioService) :
+                 std::shared_ptr<boost::asio::io_context> ioService) :
             node_(node), ioService_(ioService),
             flowcontrol_(node->settings()->hw_flow_control),
             baudrate_(node->settings()->baudrate)
@@ -548,7 +548,7 @@ namespace io {
 
     private:
         ROSaicNodeBase* node_;
-        std::shared_ptr<boost::asio::io_service> ioService_;
+        std::shared_ptr<boost::asio::io_context> ioService_;
         std::string flowcontrol_;
         uint32_t baudrate_;
 
@@ -560,7 +560,7 @@ namespace io {
     {
     public:
         SbfFileIo(ROSaicNodeBase* node,
-                  std::shared_ptr<boost::asio::io_service> ioService) :
+                  std::shared_ptr<boost::asio::io_context> ioService) :
             node_(node), ioService_(ioService)
         {
         }
@@ -598,7 +598,7 @@ namespace io {
 
     private:
         ROSaicNodeBase* node_;
-        std::shared_ptr<boost::asio::io_service> ioService_;
+        std::shared_ptr<boost::asio::io_context> ioService_;
 
     public:
         std::unique_ptr<boost::asio::posix::stream_descriptor> stream_;
@@ -608,7 +608,7 @@ namespace io {
     {
     public:
         PcapFileIo(ROSaicNodeBase* node,
-                   std::shared_ptr<boost::asio::io_service> ioService) :
+                   std::shared_ptr<boost::asio::io_context> ioService) :
             node_(node), ioService_(ioService)
         {
         }
@@ -650,7 +650,7 @@ namespace io {
 
     private:
         ROSaicNodeBase* node_;
-        std::shared_ptr<boost::asio::io_service> ioService_;
+        std::shared_ptr<boost::asio::io_context> ioService_;
         std::array<char, 100> errBuff_;
         pcap_t* pcap_;
 

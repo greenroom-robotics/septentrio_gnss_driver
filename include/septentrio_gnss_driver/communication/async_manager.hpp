@@ -146,7 +146,7 @@ namespace io {
 
         //! Pointer to the node
         ROSaicNodeBase* node_;
-        std::shared_ptr<boost::asio::io_service> ioService_;
+        std::shared_ptr<boost::asio::io_context> ioService_;
         IoType ioInterface_;
         std::atomic<bool> running_;
         std::thread ioThread_;
@@ -166,7 +166,7 @@ namespace io {
     template <typename IoType>
     AsyncManager<IoType>::AsyncManager(ROSaicNodeBase* node,
                                        TelegramQueue* telegramQueue) :
-        node_(node), ioService_(std::make_shared<boost::asio::io_service>()),
+        node_(node), ioService_(std::make_shared<boost::asio::io_context>()),
         ioInterface_(node, ioService_), telegramQueue_(telegramQueue)
     {
         node_->log(log_level::DEBUG, "AsyncManager created.");
@@ -227,7 +227,8 @@ namespace io {
             return;
         }
 
-        ioService_->post(boost::bind(&AsyncManager<IoType>::write, this, cmd));
+        boost::asio::post(*ioService_,
+                          boost::bind(&AsyncManager<IoType>::write, this, cmd));
     }
 
     template <typename IoType>
@@ -250,7 +251,7 @@ namespace io {
     template <typename IoType>
     void AsyncManager<IoType>::runIoService()
     {
-        ioService_->reset();
+        ioService_->restart();
         ioService_->run();
         node_->log(log_level::DEBUG, "AsyncManager ioService terminated.");
     }
