@@ -288,7 +288,6 @@ namespace io {
                                             node_->settings()->device_tcp_ip + ":" +
                                             port_ + "...");
 
-            auto firstEndpoint = endpoints.begin();
             try
             {
                 boost::system::error_code ec = connectInternal(endpoints);
@@ -297,9 +296,9 @@ namespace io {
                     node_->log(
                         log_level::ERROR_THROTTLE,
                         "TCP connection to " +
-                            firstEndpoint->endpoint().address().to_string() +
+                            endpoints.begin()->endpoint().address().to_string() +
                             " on port " +
-                            std::to_string(firstEndpoint->endpoint().port()) +
+                            std::to_string(endpoints.begin()->endpoint().port()) +
                             " failed: " + ec.message() + ". Retrying ...",
                         std::chrono::milliseconds(5000));
                     using namespace std::chrono_literals;
@@ -312,17 +311,17 @@ namespace io {
             } catch (const std::runtime_error& e)
             {
                 node_->log(log_level::ERROR,
-                           "Could not connect to " + firstEndpoint->host_name() +
-                               ": " + firstEndpoint->service_name() + ": " +
-                               e.what());
+                           "Could not connect to " +
+                               endpoints.begin()->host_name() + ": " +
+                               endpoints.begin()->service_name() + ": " + e.what());
                 return false;
             }
 
             deadline_.expires_at(boost::posix_time::pos_infin);
             stream_->set_option(boost::asio::ip::tcp::no_delay(true));
             node_->log(log_level::INFO, "Connected to " +
-                                            firstEndpoint->host_name() + ":" +
-                                            firstEndpoint->service_name() + ".");
+                                            endpoints.begin()->host_name() + ":" +
+                                            endpoints.begin()->service_name() + ".");
             return true;
         }
 

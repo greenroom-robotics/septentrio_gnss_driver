@@ -15,14 +15,14 @@ mise = "*"
 
 [package]
 name = "septentrio_gnss_driver"
-version = "1.5.4"
+version = "1.6.3"
 description = "ROSaic: C++ driver for Septentrio's GNSS and INS receivers"
 license = "BSD-3-Clause"
 authors = ["Greenroom Robotics <software-team@greenroomrobotics.com>"]
 
 [package.build.backend]
 name = "pixi-build-ros-gr"
-version = "*"
+version = ">=0.5,<0.6"
 
 # build-type = ament_idl: this package both generates interfaces AND builds a
 # node/library. ament_idl uses the same build flow as ament_cmake (full cmake
