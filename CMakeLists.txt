@@ -269,8 +269,10 @@ elseif(ament_cmake_FOUND)
   rclcpp_components_register_nodes(${library_name} "rosaic_node::ROSaicNode")
 
   # Testing
-  find_package(ament_cmake_gtest REQUIRED)
-  add_subdirectory(test)
+  if(BUILD_TESTING)
+    find_package(ament_cmake_gtest REQUIRED)
+    add_subdirectory(test)
+  endif()
 
   # Export Targets
   ament_export_targets(${library_name} HAS_LIBRARY_TARGET)

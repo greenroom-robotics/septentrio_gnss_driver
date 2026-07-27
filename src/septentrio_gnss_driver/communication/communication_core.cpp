@@ -172,7 +172,6 @@ namespace io {
             log_level::DEBUG,
             "Started timer for calling connect() method until connection succeeds");
 
-        boost::asio::io_context io;
         if (initializeIo())
         {
             initializedIo_ = manager_->connect();
