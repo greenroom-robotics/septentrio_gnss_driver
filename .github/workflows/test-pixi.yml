@@ -7,16 +7,23 @@ on:
       - main
       - master
 
+permissions:
+  contents: read
+  id-token: write
+  checks: write
+
 jobs:
   test:
-    uses: greenroom-robotics/mise/.github/workflows/ci-test.yml@v8
-    with:
-      runner: runs-on=${{ github.run_id }}/runner=2cpu-linux-x64
-      package-dir: .
-      changed-only: true
-    secrets:
-      gh-app-client-id: ${{ secrets.GH_APP_CLIENT_ID }}
-      gh-app-private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
-      azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
-      azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-      azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    runs-on: runs-on=${{ github.run_id }}/runner=2cpu-linux-x64
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: greenroom-robotics/mise/.github/actions/test@v8
+        with:
+          package-dir: .
+          gh-app-client-id: ${{ secrets.GH_APP_CLIENT_ID }}
+          gh-app-private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
