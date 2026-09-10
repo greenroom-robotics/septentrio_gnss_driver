@@ -29,6 +29,8 @@ jobs:
       package: ${{ inputs.package }}
       package_dir: .
       build_kilted: ${{ inputs.build_kilted }}
+      runner_amd64: runs-on=${{ github.run_id }}/runner=8cpu-linux-x64/volume=150gb
+      runner_arm64: runs-on=${{ github.run_id }}/runner=8cpu-linux-arm64/volume=150gb
       changelog: false
       ros_distro: kilted
     secrets:
