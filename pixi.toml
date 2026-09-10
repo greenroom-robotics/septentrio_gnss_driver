@@ -78,14 +78,22 @@ build-number = 1
 [package.extra-dependencies.test]
 ros-dev-tools-meta                   = "*"
 ros-kilted-rosidl-default-generators = "*"
+ros-kilted-ament-cmake-gtest         = "*"
 ros-kilted-ament-lint-auto           = "*"
+libboost-devel                       = "*"
+libpcap                              = "*"
+geographiclib-cpp                    = "*"
 
 [tasks]
 build = "colcon build --packages-select septentrio_gnss_driver --symlink-install"
 
+# ament_target_dependencies links the interface packages' *__rosidl_generator_py
+# libs, which declare no libpython and carry undefined CPython symbols, so the
+# gtest binaries need libpython loaded to start at all.
 [tasks.colcon-test]
 cmd        = "bash -c 'colcon test --packages-select septentrio_gnss_driver --retest-until-pass 3 --event-handlers console_direct+ || [ $? -eq 5 ]'"
 depends-on = ["build"]
+env        = { LD_PRELOAD = "$CONDA_PREFIX/lib/libpython3.so" }
 
 [tasks.test]
 cmd        = "colcon test-result --all --verbose"
