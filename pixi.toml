@@ -66,9 +66,6 @@ extras = ["test"]
 name    = "pixi-build-ros-gr"
 version = ">=0.5,<0.6"
 
-# ament_idl, not ament_cmake: same build flow, but the synthesized package.xml
-# carries the <member_of_group>rosidl_interface_packages</member_of_group> that
-# rosidl_generate_interfaces() requires.
 [package.build.config]
 mode         = "pixi-native"
 build-type   = "ament_idl"
